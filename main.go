@@ -61,6 +61,7 @@ func gra() {
 	//wys_plansze()
 	for {
 
+		przesuniecie := false
 		ev := term.PollEvent()
 		cmd := exec.Command("cmd", "/c", "cls")
 		cmd.Stdout = os.Stdout
@@ -76,10 +77,12 @@ func gra() {
 						if plansza[i-k-1][j].liczba == 0 {
 							plansza[i-k-1][j].liczba = plansza[i-k][j].liczba
 							plansza[i-k][j].liczba = 0
+							przesuniecie = true
 						} else if plansza[i-k][j].liczba == plansza[i-k-1][j].liczba && !plansza[i-k][j].zmiana {
 							plansza[i-k-1][j].liczba *= 2
 							plansza[i-k][j].liczba = 0
 							plansza[i-k-1][j].zmiana = true
+							przesuniecie = true
 						}
 					}
 				}
@@ -94,10 +97,12 @@ func gra() {
 						if plansza[i+k+1][j].liczba == 0 {
 							plansza[i+k+1][j].liczba = plansza[i+k][j].liczba
 							plansza[i+k][j].liczba = 0
+							przesuniecie = true
 						} else if plansza[i+k][j].liczba == plansza[i+k+1][j].liczba && !plansza[i+k][j].zmiana {
 							plansza[i+k+1][j].liczba *= 2
 							plansza[i+k][j].liczba = 0
 							plansza[i+k+1][j].zmiana = true
+							przesuniecie = true
 						}
 					}
 				}
@@ -112,10 +117,12 @@ func gra() {
 						if plansza[i][j-k-1].liczba == 0 {
 							plansza[i][j-k-1].liczba = plansza[i][j-k].liczba
 							plansza[i][j-k].liczba = 0
+							przesuniecie = true
 						} else if plansza[i][j-k].liczba == plansza[i][j-k-1].liczba && !plansza[i][j-k].zmiana {
 							plansza[i][j-k-1].liczba *= 2
 							plansza[i][j-k].liczba = 0
 							plansza[i][j-k-1].zmiana = true
+							przesuniecie = true
 						}
 					}
 				}
@@ -131,19 +138,23 @@ func gra() {
 						if plansza[i][j+k+1].liczba == 0 {
 							plansza[i][j+k+1].liczba = plansza[i][j+k].liczba
 							plansza[i][j+k].liczba = 0
+							przesuniecie = true
 						} else if plansza[i][j+k].liczba == plansza[i][j+k+1].liczba && !plansza[i][j+k].zmiana {
 							plansza[i][j+k+1].liczba *= 2
 							plansza[i][j+k].liczba = 0
 							plansza[i][j+k+1].zmiana = true
+							przesuniecie = true
 						}
 					}
 				}
 			}
 		}
 		zeruj_zmiany()
-		dodaj_liczby()
+		if przesuniecie {
+			dodaj_liczby()
+		}
 		wys_plansze()
-
+		przegrana()
 	}
 }
 func dodaj_liczby() {
@@ -176,16 +187,51 @@ func zeruj_zmiany() {
 	}
 }
 
+func przegrana() {
+
+	for i := range plansza {
+		for j := range plansza[i] {
+			if plansza[i][j].liczba == 0 {
+				return
+			}
+		}
+	}
+
+	for i := range plansza {
+		for j := range plansza[i] {
+			if i > 0 {
+				if plansza[i][j].liczba == plansza[i-1][j].liczba {
+					return
+				}
+			}
+			if i < 3 {
+				if plansza[i][j].liczba == plansza[i+1][j].liczba {
+					return
+				}
+			}
+			if j > 0 {
+				if plansza[i][j].liczba == plansza[i][j-1].liczba {
+					return
+				}
+			}
+			if j < 3 {
+				if plansza[i][j].liczba == plansza[i][j+1].liczba {
+					return
+				}
+
+			}
+		}
+
+	}
+	fmt.Println("Nie mozna wykonac zadnego ruchu -koniec gry")
+	os.Exit(3)
+}
 func main() {
-	//fmt.Println("Hello World!")
-	//plansza[2][2] = 1024
-	//plansza[1][3] = 128
-	//wys_plansze()
+
+	dodaj_liczby()
 	dodaj_liczby()
 	zeruj_zmiany()
 	term.Init()
-
-	//defer term.Close()
 
 	gra()
 
